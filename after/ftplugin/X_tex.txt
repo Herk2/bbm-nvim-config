@@ -1,0 +1,535 @@
+" LaTeX Series Part 2 *** A LuaSnip guide for LaTeX workflows
+
+
+" LaTeX Series Part 3 *** Vim’s ftplugin system
+
+
+" The VimTeX plugin uses <localleader> in its default mappings, so it is important to set a local leader key for LaTeX files. To do this, add the following code to your ftplugin/tex.vim file:
+
+" This code would go in ftplugin/tex.vim, and sets
+" Space as the leader key for "tex" filetype.
+let maplocalleader = " "
+
+
+" LaTeX Series Part 4 *** Getting started with the VimTeX plugin
+
+
+" LaTeX Series Part 4 / Customization is easy
+
+" Example: Customization
+"(For background of what’s going under the hood, check out the final article in this series, 7. A Vim Configuration Primer for Filetype-Specific Workflows.)
+" Use `dsm` to delete surrounding math (replacing the default shorcut `ds$`)
+nmap dsm <Plug>(vimtex-env-delete-math)
+
+
+" LaTeX Series Part 4 / Text Objects
+
+" Cf :help text-objects and the famous Stack Overflow answer "Your problem with Vim is that you don’t grok vi." https://stackoverflow.com/questions/1218390/what-is-your-most-productive-shortcut-with-vim/1220118#1220118
+
+" Example: Changing a default text object mapping. Re "Table of VimTeX text objects"
+" As an example to get you started with changing default mappings, VimTeX uses `am` and `im` for the item text objects (i.e. items in itemize or enumerate environments) and a$ and i$ for the math objects.
+" You might prefer to use (say) ai/ii for items (instead of `am` and `im`) and am/im for math (instead of a$,\/i$), and could implement this change by placing the following code in ftplugin/tex.vim (or similar i.e. tex-buffer specific):
+
+" Use `ai` and `ii` for the item text object (instead of `am`/`im`)
+omap ai <Plug>(vimtex-am)
+xmap ai <Plug>(vimtex-am)
+omap ii <Plug>(vimtex-im)
+xmap ii <Plug>(vimtex-im)
+
+" You could then use the `am`/`im` mapping to access the math text object (instead of `a$`/`i$`), or `ai`/`ii` to access items. Note that the mappings should be defined in both operator-pending and visual mode, so we use both omap and xmap.
+omap am <Plug>(vimtex-a$)
+xmap am <Plug>(vimtex-a$)
+omap im <Plug>(vimtex-i$)
+xmap im <Plug>(vimtex-i$)
+
+
+" Example: Disabling all default mappings and selectively defining your own / " LaTeX Series Part 4 / Text Objects
+
+" To disable all VimTeX default mappings use g:vimtex_mappings_enabled = 0 in your ftplugin/tex.vim (or similar).
+
+" An example of disabling all default VimTeX mappings, then selectively
+" defining your own. This code could go in ftplugin/tex.vim.
+
+" Disable VimTeX's default mappings
+"let g:vimtex_mappings_enabled = 0
+let g:vimtex_mappings_enabled = 1
+
+" Manually redefine only the mappings you wish to use
+" ----------------------------------------------------- "
+" Some text objects
+omap ac <Plug>(vimtex-ac)
+omap id <Plug>(vimtex-id)
+omap ae <Plug>(vimtex-ae)
+xmap ac <Plug>(vimtex-ac)
+xmap id <Plug>(vimtex-id)
+xmap ae <Plug>(vimtex-ae)
+
+" Some motions
+map %  <Plug>(vimtex-%)
+map ]] <Plug>(vimtex-]])
+map [[ <Plug>(vimtex-[[)
+
+" A few commands
+nmap <localleader>li <Plug>(vimtex-info)
+nmap <localleader>ll <Plug>(vimtex-compile)
+
+" This example, together with the list of default mappings in
+" :help vimtex-default-mappings, should be enough to get you on your
+" way towards your own configuration.
+
+
+" LaTeX Series Part 4 / Insert mode mappings
+
+" VimTeX provides a number of insert mode mappings, which are described in
+" :help vimtex-imaps. VimTeX mappings provide a similar (but less
+" feature-rich) functionality to snippets, described in an earlier article
+" in this series: https://www.ejmastnak.com/tutorials/vim-latex/ultisnips/
+" If you use a snippets plugin, you can probably safely disable VimTeX’s
+" insert mode mappings without any loss of functionality. VimTeX’s insert
+" mode mappings are enabled by default; disable them by setting
+" g:vimtex_imaps_enabled = 0 in your ftplugin/tex.vim file
+"g:vimtex_imaps_enabled = 0
+
+" VimTeX’s insert mode mappings are triggered with the prefix defined in
+" the variable g:vimtex_imaps_leader, which is the backtick ` by default.
+" VimTeX offers a lot of room for configuration (e.g. using anonymous
+" expansion functions). If you are interested in using its insert mode
+" mappings, read through :help vimtex-imaps in detail.
+
+
+" LaTeX Series Part 4 / Options (i.e. VimTeX's Options)
+
+"VimTeX’s options are documented at `:help vimtex-options`; the documentation is clear and largely self-explanatory, and you should skim through it to see which options are available.
+
+" Where should I put my VimTeX configuration? In practice, you can just dump everything in your vimrc and be fine. A cleaner setup might be to:
+
+" 1. Use a file in your 'plugin' directory (e.g. 'plugin/tex.vim' or 'plugin/vimtex.vim' the name is your choice) to set all global VimTeX options (those that match g:*).
+" 2. Use the file 'ftplugin/tex.vim' for other VimTeX-related configuration that you want to apply only in buffers with the tex filetype (e.g. LaTeX-specific keymaps and text objects).
+
+" Placing global options in 'plugin' ensures that (1) these options load
+" before VimTeX and (2) do not needlessly load multiple times when editing
+" multiple LaTeX files in the same Vim session (see the discussion in
+" VimTeX issue #2714 for details);
+
+" While placing things like keymaps in 'ftplugin' ensures these keymaps only
+" apply in LaTeX files and don’t interfere with mappings you might have set
+" in for other file types.
+
+" LaTeX Series Part 4 / Disabling default VimTex features
+
+" The most common use case for VimTeX options is disabling a few default
+" VimTeX features that you don’t need. Here is the general workflow:
+
+" As a concrete example, one could disable VimTeX’s indent, insert mode
+" mapping, completion, and syntax concealment features by placing the
+" following code in ftplugin/tex.vim:
+
+" A few examples of disabling default VimTeX features.
+" The code could go in ftplugin/tex.vim.
+"let g:vimtex_indent_enabled   = 0      " turn off VimTeX indentation
+"let g:vimtex_imaps_enabled    = 0      " disable insert mode mappings (e.g. if you use UltiSnips)
+"let g:vimtex_complete_enabled = 0      " turn off completion
+"let g:vimtex_syntax_enabled   = 0      " disable syntax conceal
+
+
+" Example: Changing the default delimiter toggle list
+
+" Here is another real-life example: to add \big \big to the delimiter toggle list used by VimTeX’s toggle surrounding delimiter” feature
+" (see the earlier section on Toggle-style mappings), add the following code to your ftplugin/tex.vim file (or similar):
+
+" Example: adding `\big` to VimTeX's delimiter toggle list
+let g:vimtex_delim_toggle_mod_list = [
+  \ ['\left', '\right'],
+  \ ['\big', '\big'],
+  \]
+
+" The tsd <Plug>(vimtex-delim-toggle-modifier) mapping would then use
+" both \left \right and \big \big. The VimTeX documentation explains
+" configuring the delimiter list in more detail at :help g:vimtex_delim_toggle_mod_list.
+
+" Commands
+" The VimTeX plugin provides a number of user commands, and these are
+" listed and described in the documentation section :help vimtex-commands.
+" The commands mostly cover compilation, PDF reader integration, and system
+" and plugin status; Cf :help vimtex-commands
+
+" As a side note, most but not all VimTeX commands can be triggered by
+" default using a shortcut in the LHS of the three-column list in
+" :help vimtex-default-mappings.
+" For those commands without a default shortcut mapping, defining one can
+" be as simple as a single line of Vimscript. Here is an example, which you
+" could place in ftplugin/tex.vim, that makes the key combination
+" <leader>wc call the VimTeX command VimtexCountWords:
+
+" Example: make `<leader>wc` call the command `VimtexCountWords`;
+" you might place this code in ftplugin/tex.vim.
+noremap <leader>wc <Cmd>VimtexCountWords<CR>
+" (This mapping uses the <Cmd> keyword, which is a Vimscript best practice
+" when defining mappings that specifically call commands.
+" cf :help map-cmd for details.)
+
+
+" LaTeX Series Part 4 / Syntax Highlighting
+
+" VimTeX provides syntax highlighting that improves on Vim’s built-in syntax plugin for LaTeX. For most use cases VimTeX’s syntax features should “just work” out of the box, and you won’t need to do any configuration yourself (if you’re interested in details, see :help vimtex-syntax). I can think of three things worth mentioning:
+
+VimTeX provides correct syntax highlighting for a number of common LaTeX packages; this means, for example, that the align environment provided by the amsmath package or code listings using the minted package will be correctly highlighted. Again, you shouldn’t need to configure any of this manually, but you might appreciate knowing the package-highlighting feature exists. See :help vimtex-syntax-packages and g:vimtex_syntax_packages for details.
+
+VimTeX’s syntax engine is “context-aware” (e.g. can distinguish regular text from LaTeX’s math mode). This feature makes possible math-sensitive snippet expansion, which was explained in the snippets article earlier in this series.
+
+VimTeX provides a feature called “syntax-concealment”, which replaces various commands, such as math-mode commands for Greek letters, with a shorter Unicode equivalent. For example, the \alpha command would appear as the character α in your terminal. See :help vimtex-syntax conceal if you are interested in this feature.
+
+" 1. package-highlighting feature exists. See :help vimtex-syntax-packages and g:vimtex_syntax_packages for details.
+" 2. VimTeX’s syntax engine is “context-aware” and can distinguish regular text from LaTeX’s math mode.
+" 3. VimTeX provides a feature called “syntax-concealment”, which replaces various commands, such as math-mode commands for Greek letters, with a shorter Unicode equivalent. For example, the \alpha command would appear as the character α in your terminal. See :help vimtex-syntax conceal if you are interested in this feature.
+
+
+" LaTeX Series Part 4 / Other Features (of VimTeX)
+" Ten more features to look into once you master the basics.
+
+
+" LaTeX Series Part 5 *** Compiling LaTeX Documents in a Vim-Based Workflow
+
+" This article covers compilation and should explain what you need to get started compiling LaTeX documents from within Vim using the VimTeX plugin’s compilation.
+
+" LaTeX Series Part 5 / What to read in this article
+" Most users will only need to read the first part of this article.
+
+" 1. Compiling via VimTeX: how to use VimTeX’s default compilation interface, which should work out of the box and satisfy the use cases of most users with minimal configuration.
+
+
+
+" LaTeX Series Part 5 / Using VimTeX’s compilation interface
+
+" Compile LaTeX documents from within Vim using the command :VimtexCompile, which you can either type directly as a Vim command or access with the default VimTeX mapping <localleader>ll.
+
+" Optionally, if you don’t like <localleader>ll as the compilation shortcut, define a custom mapping to call :VimtexCompile and use that instead.
+
+
+" LaTeX Series Part 5 / How VimTeX’s compilation interface works.
+
+" VimTeX offers multiple compilation backends, and each backend can use different LaTeX engines to perform actual compilation. Here is a short summary:
+
+" VimTeX’s uses latexmk as the default compiler backend. This should work well for most users, and I will cover only the default latexmk backend in this article. See :help g:vimtex_compiler_method if you want to use something else.
+
+" The default LaTeX engine used by the latexmk backend is pdflatex, which should again work well for most users. If you want to use something else (for example LuaLaTeX or XeLaTeX), read through :help g:vimtex_compiler_latexmk_engines.
+
+" VimTeX offers both continuous and “single-shot” compilation via the commands :VimtexCompile and :VimtexCompileSS, respectively. In continuous compilation mode, which you turn on with :VimtexCompile, latexmk automatically recompiles your LaTeX document after every file change until you call :VimtexStop.
+
+" In a continuous compilation workflow, you would typically open your document, call :VimtexCompile once, and forget about compilation until you close the document. In a more traditional “single-shot” workflow, you would open a LaTeX document, make some edits, and then call :VimtexCompileSS whenever you’re ready to see the changes reflected in the corresponding PDF.
+
+For more information, consult :help vimtex-compiler and the references therein.
+
+" You can configure VimTeX’s latexmk compiler via the dictionary-like variable g:vimtex_compiler_latexmk; see :help g:vimtex_compiler_latexmk if interested. The default values should work well for most users.
+
+" You can get a summary of your compiler status using the command VimtexInfo
+
+
+" LaTeX Series Part 5 / Shortcut for compilation
+
+" Problem: manually typing out the commands :VimtexCompile or :VimtexCompileSS to start compilation is tedious.
+
+Solution: map the :VimtexCompile or :VimtexCompileSS commands to a keyboard shortcut.
+
+VimTeX offers <localleader>ll as a default shortcut for calling :VimtexCompile, meaning you can type <localleader>ll (in normal mode) to trigger the :VimtexCompile command.
+
+" If you prefer, setting your own shortcut is really easy! For example, to
+" use <localleader>c to trigger compilation, place the following code in your ftplugin/tex.vim file:
+
+" Use `<localleader>c` to trigger continuous compilation...
+nmap <localleader>c <Plug>(vimtex-compile)
+
+" ...or for single-shot compilation, if you prefer.
+"nmap <localleader>c <Plug>(vimtex-compile-ss)
+
+" Aside: The above mapping uses the <Cmd> keyword (see :help map-cmd for documentation), which lets you call commands directly without switching Vim modes. The final article in the series, 7. A Vim Configuration Primer for Filetype-Specific Workflows, explains key mappings in more detail.
+
+
+" LaTeX Series Part 5 / A QuickFix Menu crash course
+
+" After compiling with :VimtexCompile or :VimtexCompileSS, VimTeX will automatically open the QuickFix menu if warnings or errors occurred during compilation (it stays closed if compilation completes successfully).
+
+" For most compilation errors, the QuickFix menu will display the error’s line number and a (hopefully) useful error message. In such cases you can use the Vim commands :cc and :cn to jump directly to the offending line (much more info at :help quickfix in the Vim docs). After the error is fixed, the QuickFix menu disappears.
+
+" Here are two VimTeX-related QuickFix settings you might be interested in
+" tweaking:
+
+" #1. Don’t open QuickFix for warnings: by default, VimTeX opens the
+" QuickFix menu if compilation produces warning messages but no error
+" messages. LaTeX’s warning messages are often unhelpful. To open the
+" QuickFix menu only if compilation fails with error messages, use the
+" following:
+
+" Don't open QuickFix for warning messages if no errors are present.
+" Cf :help g:vimtex_quickfix_open_on_warning for the official documentation.
+let g:vimtex_quickfix_open_on_warning = 0
+
+" #2. Filter out selected warnings: VimTeX makes it easy to filter out
+" undesirable warning messages produced during LaTeX compilation. To do
+" so, use the variable g:vimtex_quickfix_ignore_filters to define a set of
+" Vim regular expression filters; the compilation messages that match these
+" filters will then disappear from the QuickFix menu.
+" Cf :help regular-expression for a review of Vim’s regular expression
+" syntax. Here are some examples to get you started (put this in your
+" ftplugin/tex.vim file):
+
+" Filter out some compilation warning messages from QuickFix display
+let g:vimtex_quickfix_ignore_filters = [
+      \ 'Underfull \\hbox',
+      \ 'Overfull \\hbox',
+      \ 'LaTeX Warning: .\+ float specifier changed to',
+      \ 'LaTeX hooks Warning',
+      \ 'Package siunitx Warning: Detected the "physics" package:',
+      \ 'Package hyperref Warning: Token not allowed in a PDF string',
+      \]
+
+" VimTeX’s QuickFix behavior is quite configurable, and I suggest you read through the VimTeX documentation beginning at :help g:vimtex_quickfix_enabled and ending at :help g:vimtex_quickfix_open_on_warning to see if anything catches your eye. In fact, consider reading through the entire VimTeX compilation documentation—see :help vimtex-compiler and the references therein. VimTeX offers plenty of compilation goodies beyond the scope of this article that you might be interested in discovering and experimenting with yourself.
+
+
+" LaTeX Series Part 5 / How to use pdflatex and latexmk
+
+" This section is a crash course in the pdflatex and latexmk programs; if you are familiar with these programs, feel free to jump ahead to the section Writing a simple LaTeX compiler plugin.
+
+" About pdflatex and latexmk
+Both pdflatex and latexmk are command line programs that read a plain text LaTeX file as input and produce a PDF file as output. In this context, the process of turning plain text LaTeX code into a PDF is called compilation. This guide covers two related compilation programs:
+
+" pdflatex ships by default with any standard LaTeX installation and is the standard method for converting LaTeX files into PDFs.
+" latexmk is a Perl script used to fully automate compiling complicated LaTeX documents with cross-references and bibliographies.
+
+" To get useful functionality from pdflatex and latexmk you’ll need to specify some command line options. The two sections below explain the options for both pdflatex and latexmk that have served me well over the past few years—these could be a good starting point if you are new to command line compilation.
+
+
+" LaTeX Series Part 5 / Possible options for pdflatex
+
+" The full pdflatex command I use to compile tex files, with all options shown, is
+" pdflatex -file-line-error -halt-on-error -interaction=nonstopmode -output-dir={output-directory} -synctex=1 {sourcefile.tex}
+
+" where
+" {sourcefile.tex} represents the full path to the tex file you wish to compile (e.g. ~/Documents/myfile.tex), and
+" {output-directory} represents the full path to the directory you want the compilation’s output files (e.g. PDF files, log files, SyncTeX files, etc…) to go. The output directory should generally be set to the parent directory of sourcefile.tex.
+
+
+" LaTeX Series Part 5 / Possible options for latexmk
+
+" When compiling tex files with latexmk instead of with pdflatex, I use the command
+
+" latexmk -pdf -output-directory={output-directory} {sourcefile.tex}
+
+" together with the following latexmkrc file:
+
+" # This file lives at ~/.config/latexmk/latexmkrc
+" # and contains the single line...
+" $pdflatex = "pdflatex -file-line-error -halt-on-error -interaction=nonstopmode -synctex=1";
+
+" First, regarding the options in the latexmk call itself:
+
+" -pdf tells latexmk to compile using pdflatex, which creates a PDF output file.
+
+" -output-dir={output-directory} has the same role as in the section on options for pdflatex.
+
+" The latexmkrc file configures latexmk’s default behaviour; the $pdflatex = "..." line in the latexmkrc specifies the options latexmk should use when using pdflatex for compilation. This saves specifying pdflatex options by hand on every latexmk call. Note that these options match the options for the pdflatex calls described in the section on options for pdflatex.
+
+" You should put your latexmkrc file in one of the following locations:
+
+" ~/.config/latexmk/latexmkrc (or XDG_CONFIG_HOME/latexmk/latexmkrc if you use XDG_CONFIG_HOME), or
+" ~/.latexmkrc.
+" The latexmkrc file’s usage is documented in man latexmkrc under the section CONFIGURATION/INITIALIZATION (RC) FILES. The latexmk program is well-documented in general; see man latexmk for far more information than is covered here, including the possibility of fancy features like continuous compilation.
+
+" You can use other options, too
+" The pdflatex and latexmk commands and options described above are by no means the definitive way to compile LaTeX documents. Consider them a starting point based on what has served me well during my undergraduate studies. I encourage you to read through the pdflatex and latexmk documentation and experiment with what works for you.
+
+
+" LaTeX Series Part 5 / Warning: compiling when using the minted package
+
+The minted package ( https://github.com/gpoore/minted ) provides expressive syntax highlighting for LaTeX documents, which is useful when you include samples of computer code in your LaTeX documents.
+" The minted package works by leveraging the Pygments syntax highlighting library
+" ( https://github.com/pygments/pygments).
+
+
+
+" Latex Series Part 6 *** Setting Up a PDF Reader for Writing LaTeX with Vim
+
+" Latex Series Part 6 / A PDF reader on macOS
+
+" Use Skim.
+" You might also have success using Zathura on macOS…
+…thanks to the Homebrew formula provided by homebrew-zathura project and the instructions in :help vimtex-faq-zathura-macos. I’ve personally managed to get Zathura and VimTeX working on an Intel MacBook Pro (and have included a section at the end of this article explaining how), but many VimTeX users have reported issues following the same produced I used, particularly with Apple Silicon Macs.
+
+
+" Latex Series Part 6 / Summary: What works on what platform / Zathura on macOS (Intel-based MacBook Pro 11,5; macOS 12.1; Zathura 0.4.9 built from homebrew-zathura)
+
+" Neovim & MacVim Editors:
+" Forward search works;	Inverse search works;	Editor keeps focus after forward
+" search;	Focus returns to editor after inverse search.
+
+
+" Latex Series Part 6 / Skim (read this on macOS)
+
+" You will need the VimTeX plugin installed. Double-check that VimTeX’s PDF viewer interface is enabled by entering :echo g:vimtex_view_enabled in Vim.
+" # Enter this in Vim's command mode
+" :echo g:vimtex_view_enabled
+" > 1  # VimTeX's PDF viewer interface is enabled!
+" > 0  # VimTeX's PDF viewer interface is disabled---you'll have to enable
+
+" Place the following code in your ftplugin/tex.vim file:
+" Use Skim as the VimTeX PDF viewer
+let g:vimtex_view_method = 'skim'
+" See :help vimtex-view-skim for more information
+
+" Use the :VimtexView command in Vim/Neovim to trigger forward search. You can either type this command manually, use the default VimTeX shortcut <localleader>lv, or define your own shortcut;
+
+"to define your own shortcut place the following code in your ftplugin/tex.vim file:
+" Define a custom shortcut to trigger VimtexView for Forward Search
+nmap <localleader>v <plug>(vimtex-view)
+
+
+" Configure inverse search: First open Skim and navigate to Preferences > Sync and select PDF-TeX Sync Support. Then, depending on your editor, proceed as follows:
+
+" MacVim: select MacVim in the Preset field, which will automatically populate the Command and Arguments fields with correct values.
+
+" Neovim: set the Preset field to Custom, set the Command field to nvim, and the Arguments field to
+
+" --headless -c "VimtexInverseSearch %line '%file'"
+" The above command comes from :help vimtex-synctex-inverse-search
+
+" In Skim, use <Cmd>-<Shift>-<Left-Mouse-Click> (i.e. a left mouse click while holding the command and shift keys) in Skim to trigger inverse search.
+
+
+" Latex Series Part 6 / Zathura on macOS
+
+" For Apple Silicon Macs, a slightly more complicated process setting up Zathura is described in Homebrew Zathura issue 99.
+
+Quoting more or less directly from :help vimtex-faq-zathura-macos, here is how to build Zathura on macOS (see Homebrew Zathura issue 99 if you have an Apple Silicon chip):
+
+" 1. Check if you already have Zathura installed using e.g. which zathura. If you have Zathura installed, I recommend uninstalling it and repeating from scratch to ensure all dependencies are correctly sorted out.
+
+" 2. If needed, uninstall your existing Zathura and related libraries with the following code:
+"# Remove symlinks
+" brew unlink zathura-pdf-poppler
+" # or use `brew unlink zathura-pdf-mupdf` if you have mupdf installed
+" brew unlink zathura
+" brew unlink girara
+
+" # Uninstall
+" brew uninstall zathura-pdf-poppler
+" # or use `brew uninstall zathura-pdf-mupdf` if you have mupdf installed
+" brew uninstall zathura
+" brew uninstall girara
+
+" 3. Zathura needs dbus to work properly; install it with brew install dbus. If you already have dbus installed, rumor has it that you should reinstall it with brew reinstall dbus, although I have not checked if this is necessary myself.
+
+" 4. Set a bus address for dbus sessions with the following environment variable:
+" DBUS_SESSION_BUS_ADDRESS="unix:path=$DBUS_LAUNCHD_SESSION_BUS_SOCKET"
+
+" You should then make this change permanent by placing the following code in one of your shell’s start-up files:
+" export DBUS_SESSION_BUS_ADDRESS="unix:path=$DBUS_LAUNCHD_SESSION_BUS_SOCKET"
+" You might want to read through the discussion VimTeX issue #2391, which solves a Zathura issue by properly setting DBUS_SESSION_BUS_ADDRESS
+" https://github.com/lervag/vimtex/issues/2391#issuecomment-1127129402
+
+" 5. Change the value of <auth><\auth> in /usr/local/opt/dbus/share/dbus-1/session.conf from EXTERNAL to DBUS_COOKIE_SHA1:
+
+" # Before <auth>EXTERNAL<\auth>
+" # After <auth>DBUS_COOKIE_SHA1<\auth>
+
+" 6. Run brew services start dbus to start dbus. You can double-check dbus is running with brew services info dbus, which should output something like this (potentially after a reboot):
+
+$ brew services info dbus
+dbus (org.freedesktop.dbus-session)
+Running: ✔
+Loaded: ✔
+
+" 7. Install the most recent version of Zathura (i.e. HEAD):
+" brew tap zegervdv/zathura
+" brew install girara --HEAD
+" brew install zathura --HEAD --with-synctex
+" brew install zathura-pdf-poppler
+" mkdir -p $(brew --prefix zathura)/lib/zathura
+" ln -s $(brew --prefix zathura-pdf-poppler)/libpdf-poppler.dylib $(brew --prefix zathura)/lib/zathura/libpdf-poppler.dylib
+
+" Notes:
+" You might be prompted by Homebrew to install the Apple Command Line Tools before you can complete brew install girara --HEAD. If so, just follow Homebrew’s " suggestion (which will probably be something along the lines of xcode-select --install), then retry brew install girara --HEAD.
+" Ensure you use brew install zathura --HEAD --with-synctex to get a Zathura with SyncTeX support; the homebrew-zathura GitHub page only suggests brew install zathura --HEAD.
+
+" 8. Reboot and test if Zathura starts and SyncTeX works.
+
+" For the original GitHub discussion that produced the instructions in :help vimtex-faq-zathura-macos, see the VimTeX issue Viewer cannot find Zathura window ID on macOS #1737.
+
+
+" Latex Series Part 6 / Setting up Zathura on macOS
+
+" Note: during my testing, I found that focus failed to return to both Neovim and MacVim after inverse search on Zathura. To fix these issues, depending on your editor, scroll down to one of:
+
+Returning focus to Neovim after inverse search on macOS
+Returning focus to MacVim after inverse search on macOS
+
+
+" Latex Series Part 6 / Fixing focus loss problems on macOS
+
+" Returning focus to Neovim after inverse search on macOS
+" Relevant editor: Neovim used with Skim or Zathura on macOS.
+
+" Identify the name of your terminal (e.g. iTerm, Alacritty, Terminal, etc.); this is just the name of the macOS application for your terminal. Then define the following Vimscript function in ftplugin/tex.vim…
+
+function! s:TexFocusVim() abort
+  " Replace `TERMINAL` with the name of your terminal application
+  " Example: execute "!open -a iTerm"
+  " Example: execute "!open -a Alacritty"
+  silent execute "!open -a iTerm"
+  redraw!
+endfunction
+
+" Then define the following Vimscript autocommand group in your
+" ftplugin/tex.vim:
+
+augroup vimtex_event_focus
+  au!
+  au User VimtexEventViewReverse call s:TexFocusVim()
+augroup END
+
+
+" Latex Series Part 6 / Returning focus to MacVim after inverse search on macOS
+
+Relevant editor: MacVim used with Zathura on macOS.
+
+
+" Identify the name of your terminal (e.g. iTerm, Alacritty, Terminal, etc.); this is name of the macOS application for your terminal. Then define the following Vimscript function in ftplugin/tex.vim:
+
+function! s:TexFocusVim() abort
+  if has("gui_running")  " for MacVim
+    silent execute "!open -a MacVim"
+  else                   " for terminal Vim
+    " Replace `TERMINAL` with the name of your terminal application
+    " Example: execute "!open -a iTerm"
+    " Example: execute "!open -a Alacritty"
+    silent execute "!open -a iTerm"
+  endif
+  redraw!
+endfunction
+
+" If you already have MacVim installed, try running open -a MacVim from the command line. If this opens MacVim, you’re good to go
+
+" Finally, define the following Vimscript autocommand group in your ftplugin/tex.vim:
+
+augroup vimtex_event_focus
+  au!
+  au User VimtexEventViewReverse call s:TexFocusVim()
+augroup END
+
+
+" Latex Series Part 6 / Further Reading
+
+" I suggest you read through the VimTeX documentation beginning at :help g:vimtex_view_enabled and ending at :help g:vimtex_view_zathura_check_libsynctex.
+
+" Here is an example: VimTeX automatically opens your PDF reader when you first compile a document, even if you have not called :VimtexView. If you prefer to disable this behavior, place the following code in your ftplugin/tex.vim:
+
+" Don't automatically open PDF viewer after first compilation
+let g:vimtex_view_automatic = 0
+
+
+
+" Latex Series Part 7 *** A Vim Configuration Primer for Filetype-Specific Workflows
+
+" This Part 7 article provides a theoretical background for use of Vimscript in filetype-specific workflows and aims to give you a foundation for understanding the filetype plugin system, key mapping syntax, and Vimscript functions used earlier in this series.
+
+
+

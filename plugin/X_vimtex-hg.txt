@@ -1,0 +1,26 @@
+" LaTeX Series Part 4 / Options (i.e.ViMTex's Options)
+
+" Where should I put my VimTeX configuration? In practice, you can just dump everything in your vimrc and be fine. A cleaner setup might be to:
+
+" 1. Use a file in your 'plugin' directory (e.g. 'plugin/tex.vim' or 'plugin/vimtex.vim' the name is your choice) to set all global VimTeX options (those that match g:*).
+" 2. Use the file 'ftplugin/tex.vim' for other VimTeX-related configuration that you want to apply only in buffers with the tex filetype (e.g. LaTeX-specific keymaps and text objects).
+
+" Placing global options in plugin/ ensures that (1) these options load
+" before VimTeX and (2) do not needlessly load multiple times when editing
+" multiple LaTeX files in the same Vim session (see the discussion in
+" VimTeX issue #2714 for details);
+" while placing things like keymaps in ftplugin ensures these keymaps only
+" apply in LaTeX files and don’t interfere with mappings you might have set
+" in for other file types.
+
+" rjg_opts
+:let g:vimtex_view_general_viewer = 'skim'
+" use lervag's vimtex general options
+let g:vimtex_view_general_options = '--unique file:@pdf\#src:@line@tex'
+" jdhao_opts
+"let g:vimtex_view_general_viewer = 'skim'
+ "let g:vimtex_view_general_viewer = '/Applications/Skim.app/Contents/SharedSupport/displayline'
+"let g:vimtex_view_general_options = '-r @line @pdf @tex'
+" common_opts
+let g:vimtex_compiler_method = 'latexmk'
+let maplocalleader = " "
