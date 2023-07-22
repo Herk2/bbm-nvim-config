@@ -36,12 +36,12 @@ vim.cmd[[
   "smap <silent><expr> <kj> luasnip#jumpable(-1) ? '<Plug>luasnip-jump-prev' : '<kj>'
 ]]
 
--- Finally, you may want to set mappings to cycle through choice nodes:
+-- Finally, you may want to set mappings to cycle through 'choice nodes':
 
 vim.cmd[[
   " Cycle forward through choice nodes with Control-f (for example)
   imap <silent><expr> <C-f> luasnip#choice_active() ? '<Plug>luasnip-next-choice' : '<C-f>'
-  smap <silent><expr> <C-f> luasnip#choice_active() ? '<Plug>luasnip-next-choic
+  smap <silent><expr> <C-f> luasnip#choice_active() '<Plug>luasnip-next-choice' : '<C-f>'
 ]]
 -- You can read about choice nodes at :help luasnip-choicenode
 --Note: You need to apply tabstop navigation in both insert and visual modes, hence the use of both imap and smap for the forward and backward jump mappings. (Well, technically select mode and not visual mode, hence the use of smap and not vmap, but for a typical end user’s purposes select and visual mode look identical. See :help select-mode for details.)

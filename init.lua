@@ -3,7 +3,7 @@ vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
 -- GENERAL
-require "config.init"
+--require "config.init" "NOTE: init.lua files don't need to be required."
 require "config.options"
 require "config.keymaps"
 require "config.plugins"
